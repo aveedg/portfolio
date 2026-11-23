@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Admin & Project Studio (Local)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding: 40px 0; background: var(--bg); }
+    .admin-container { width: min(900px, calc(100% - 40px)); margin: 0 auto; }
+    .admin-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 4px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); }
+    .admin-badge { display: inline-block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; background: #e2e8f0; color: #334155; padding: 3px 8px; border-radius: 3px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+      <div>
+        <span class="admin-badge">Local Workspace Tool</span>
+        <h1 style="font-size:24px; font-weight:700;">Portfolio Project Manager & Studio</h1>
+        <p style="font-size:14px; color:var(--ink-secondary);">Use this private tool on your machine to add projects, edit bullet descriptions, and export <code>projects.js</code>.</p>
+      </div>
+      <div>
+        <a href="index.html" class="nav-btn" target="_blank">View Live Site ↗</a>
+      </div>
+    </div>
+
+    <!-- Workflow guide card -->
+    <div class="admin-card">
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:8px;">How Updating Works on GitHub Pages</h2>
+      <p style="font-size:13px; color:var(--ink-secondary); line-height:1.6; margin-bottom:12px;">
+        GitHub Pages is a <strong>static website host</strong> with no database or server backend. Visitors cannot change your files.
+        To add new projects or files, you make changes locally on your computer and push to GitHub using either method below:
+      </p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <div style="border:1px solid var(--line); padding:16px; border-radius:3px; background:var(--bg-subtle);">
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:600; text-transform:uppercase; margin-bottom:6px;">Method 1: PowerShell Sync (Fastest)</div>
+          <p style="font-size:12px; color:var(--ink-secondary); margin-bottom:8px;">Drop files/folders in your repo, then run:</p>
+          <div class="code-box" style="margin:0; font-size:11px;">powershell -ExecutionPolicy Bypass -File .\update-projects.ps1</div>
+        </div>
+        <div style="border:1px solid var(--line); padding:16px; border-radius:3px; background:var(--bg-subtle);">
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:600; text-transform:uppercase; margin-bottom:6px;">Method 2: Visual Studio (Below)</div>
+          <p style="font-size:12px; color:var(--ink-secondary); margin-bottom:8px;">Fill in the form below, drop files to add context, and click:</p>
+          <div class="code-box" style="margin:0; font-size:11px;">"Download Updated projects.js"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Editor -->
+    <div class="admin-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="font-size:18px; font-weight:700;">Add / Edit Project</h2>
+        <select id="project-selector" class="form-select" style="width: auto; font-family: var(--font-mono); font-size: 12px;">
+          <option value="new">+ Create New Project</option>
+        </select>
+      </div>
+
+      <form id="studio-project-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="studio-title">Project Title (e.g. Job Role or Project Name) *</label>
+            <input class="form-input" id="studio-title" required placeholder="e.g. Rear Low Voltage Lead">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="studio-org">Company / Organization (optional)</label>
+            <input class="form-input" id="studio-org" placeholder="e.g. Bronco Racing Formula SAE EV or Rivian">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="studio-folder">Folder Name (exact folder name in repo) *</label>
+            <input class="form-input" id="studio-folder" required placeholder="e.g. fsae_rearLVlead">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="studio-date">Date Range *</label>
+            <input class="form-input" id="studio-date" required placeholder="e.g. 10/2024–06/2026 or 01/2026–03/2026">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="studio-desc">Project Description / Resume Bullets (one bullet per line) *</label>
+          <textarea class="form-textarea" id="studio-desc" rows="5" required placeholder="Enter bullet points (one per line):&#10;Architected the rear low voltage system with a 3.3/5/12/24V power tree...&#10;Designed the main rear IO PCB as a STM32 carrier-board..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Media Files in this Project</label>
+          <div class="dropzone" id="file-dropzone">
+            <div class="dropzone-icon">📁</div>
+            <div class="dropzone-text">Drag & drop files here, or click to browse</div>
+            <div class="dropzone-hint">Supports images (.png, .jpg), documents (.pdf), CAD (.step, .f3d), and archives (.zip)</div>
+            <input type="file" id="dropzone-file-input" multiple style="display:none;">
+          </div>
+          <div class="file-staging-list" id="staged-files-list"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid var(--line);">
+          <div>
+            <button class="filter-tab" id="copy-json-btn" type="button">Copy JSON to Clipboard</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button class="filter-tab" id="download-js-btn" type="button">Download Updated projects.js ↓</button>
+            <button class="nav-btn" id="save-studio-btn" type="button">Save Project</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Commit helper card -->
+    <div class="admin-card">
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">Ready to Publish to GitHub Pages?</h3>
+      <p style="font-size:13px; color:var(--ink-secondary); margin-bottom:10px;">
+        After replacing <code>projects.js</code> or dropping your new media files into the repository folder, commit and push:
+      </p>
+      <div class="code-box">git add .
+git commit -m "Update portfolio projects and media"
+git push origin main</div>
+      <p style="font-size:12px; color:var(--ink-muted);">GitHub Pages will build and deploy the update globally in ~30–60 seconds.</p>
+    </div>
+  </div>
+
+  <script src="projects.js"></script>
+  <script>
+    (function() {
+      let projects = window.PORTFOLIO_DATA || [];
+      let currentEditIndex = -1;
+      let stagedFiles = [];
+
+      const selector = document.getElementById('project-selector');
+      const titleInput = document.getElementById('studio-title');
+      const orgInput = document.getElementById('studio-org');
+      const folderInput = document.getElementById('studio-folder');
+      const dateInput = document.getElementById('studio-date');
+      const descInput = document.getElementById('studio-desc');
+      const dropzone = document.getElementById('file-dropzone');
+      const fileInput = document.getElementById('dropzone-file-input');
+      const stagedList = document.getElementById('staged-files-list');
+      const saveBtn = document.getElementById('save-studio-btn');
+      const downloadBtn = document.getElementById('download-js-btn');
+      const copyBtn = document.getElementById('copy-json-btn');
+
+      function populateSelector() {
+        selector.innerHTML = '<option value="new">+ Create New Project</option>';
+        projects.forEach((p, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = `Edit: ${p.title} (${p.media ? p.media.length : 0} files)`;
+          selector.appendChild(opt);
+        });
+      }
+
+      function loadProject(idx) {
+        currentEditIndex = idx;
+        if (idx === -1 || idx === 'new') {
+          document.getElementById('studio-project-form').reset();
+          stagedFiles = [];
+          renderStagedFiles();
+          return;
+        }
+
+        const p = projects[idx];
+        titleInput.value = p.title || '';
+        orgInput.value = p.organization || '';
+        folderInput.value = p.folder || '';
+        dateInput.value = p.date || '';
+
+        if (Array.isArray(p.description)) {
+          descInput.value = p.description.join('\n');
+        } else {
+          descInput.value = p.description || p.summary || '';
+        }
+
+        stagedFiles = (p.media || []).map(m => ({ ...m }));
+        renderStagedFiles();
+      }
+
+      selector.addEventListener('change', () => {
+        const val = selector.value;
+        loadProject(val === 'new' ? -1 : Number(val));
+      });
+
+      function formatBytes(bytes) {
+        if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+        if (bytes >= 1024) return (bytes / 1024).toFixed(0) + ' KB';
+        return bytes + ' B';
+      }
+
+      function cleanTitle(name) {
+        const base = name.replace(/\.[^/.]+$/, '');
+        return base.replace(/[_]/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+
+      const ALL_CATEGORIES = [
+        "Architecture",
+        "Wiring & Schematics",
+        "PCB Design",
+        "CAD & 3D Models",
+        "Prototypes & Prints",
+        "Hardware & Testing",
+        "Lab Reports & Docs",
+        "Reports & Documents",
+        "Awards & Pitches",
+        "Coursework Reports",
+        "Source Files & Archives",
+        "General"
+      ];
+
+      function detectCategory(name, ext) {
+        const lower = name.toLowerCase();
+        if (lower.includes('architecture') || lower.includes('topology') || lower.includes('block diagram') || lower.includes('system diagram') || lower.includes('system block')) {
+          return 'Architecture';
+        }
+        if (lower.includes('schematic') || lower.includes('wiring') || lower.includes('routing') || lower.includes('harness')) {
+          return 'Wiring & Schematics';
+        }
+        if (lower.includes('pcb') || lower.includes('layout') || lower.includes('gerber') || lower.includes('kicad')) {
+          return 'PCB Design';
+        }
+        if (lower.includes('cad') || lower.includes('fusion') || lower.includes('3d') || ['step', 'stp', 'f3d', 'stl', 'sldprt', 'sldasm'].includes(ext)) {
+          return 'CAD & 3D Models';
+        }
+        if (lower.includes('print') || lower.includes('prototype') || lower.includes('breadboard') || lower.includes('mockup')) {
+          return 'Prototypes & Prints';
+        }
+        if (lower.includes('pitch') || lower.includes('award') || lower.includes('hackathon') || lower.includes('competition') || lower.includes('place')) {
+          return 'Awards & Pitches';
+        }
+        if (['zip', 'tar', 'gz', '7z', 'rar'].includes(ext)) {
+          return 'Source Files & Archives';
+        }
+        if (ext === 'pdf') {
+          if (lower.includes('course') || lower.includes('inverter') || lower.includes('adder') || lower.includes('vlsi')) return 'Coursework Reports';
+          return 'Lab Reports & Docs';
+        }
+        if (['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext)) {
+          return 'Hardware & Testing';
+        }
+        return 'General';
+      }
+
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+      dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        if (e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+      });
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files) handleFiles(fileInput.files);
+      });
+
+      function handleFiles(files) {
+        Array.from(files).forEach(f => {
+          const ext = f.name.split('.').pop().toLowerCase();
+          stagedFiles.push({
+            file: f.name,
+            title: cleanTitle(f.name),
+            context: '',
+            category: detectCategory(f.name, ext),
+            type: ext,
+            size: formatBytes(f.size)
+          });
+        });
+        renderStagedFiles();
+      }
+
+      function renderStagedFiles() {
+        stagedList.innerHTML = stagedFiles.map((sf, idx) => {
+          const currentCat = sf.category || 'General';
+          const catList = ALL_CATEGORIES.includes(currentCat) ? ALL_CATEGORIES : [currentCat, ...ALL_CATEGORIES];
+          return `
+          <div class="staged-file-card" data-idx="${idx}">
+            <div>
+              <div style="font-size:12px; font-weight:600; margin-bottom:4px;">${sf.file} (${sf.size || 'N/A'})</div>
+              <input class="form-input" style="font-size:12px; padding:5px 8px;" placeholder="Media Title" value="${sf.title}" data-field="title">
+            </div>
+            <div>
+              <input class="form-input" style="font-size:12px; padding:5px 8px; margin-bottom:4px;" placeholder="Engineering Context Note" value="${sf.context || ''}" data-field="context">
+              <select class="form-select" style="font-size:11px; padding:4px 6px; width:100%; border:1px solid var(--line); background:var(--bg); border-radius:var(--radius-sm);" data-field="category">
+                ${catList.map(c => `<option value="${c}" ${c === currentCat ? 'selected' : ''}>${c}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <button type="button" class="filter-tab" style="padding:4px 8px; font-size:10px; color:#d9534f;" data-remove="${idx}">Remove</button>
+            </div>
+          </div>
+        `;
+        }).join('');
+      }
+
+      stagedList.addEventListener('input', handleFieldChange);
+      stagedList.addEventListener('change', handleFieldChange);
+
+      function handleFieldChange(e) {
+        const card = e.target.closest('[data-idx]');
+        if (!card) return;
+        const idx = Number(card.dataset.idx);
+        const field = e.target.dataset.field;
+        if (stagedFiles[idx] && field) stagedFiles[idx][field] = e.target.value;
+      }
+
+      stagedList.addEventListener('click', (e) => {
+        const rm = e.target.closest('[data-remove]');
+        if (rm) {
+          const idx = Number(rm.dataset.remove);
+          stagedFiles.splice(idx, 1);
+          renderStagedFiles();
+        }
+      });
+
+      saveBtn.addEventListener('click', () => {
+        const title = titleInput.value.trim();
+        const folder = folderInput.value.trim();
+        const date = dateInput.value.trim();
+        const descRaw = descInput.value.trim();
+        if (!title || !folder || !descRaw) {
+          alert('Please enter Title, Folder Name, and Description.');
+          return;
+        }
+
+        const bullets = descRaw.split('\n').map(l => l.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean);
+        const orgVal = orgInput.value.trim();
+        const projectData = {
+          id: folder.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+          title,
+          date: date || '2026',
+          description: bullets,
+          folder,
+          media: [...stagedFiles]
+        };
+        if (orgVal) {
+          projectData.organization = orgVal;
+        }
+
+        if (currentEditIndex >= 0) {
+          projects[currentEditIndex] = projectData;
+          alert(`Updated project "${title}"! Click "Download Updated projects.js" to save.`);
+        } else {
+          projects.unshift(projectData);
+          alert(`Added new project "${title}"! Click "Download Updated projects.js" to save.`);
+        }
+        populateSelector();
+      });
+
+      downloadBtn.addEventListener('click', () => {
+        const serialized = JSON.stringify(projects, null, 2);
+        const fileContent = `// Portfolio Project Data\n// Automatically synced and editable\n\nwindow.PORTFOLIO_DATA = ${serialized};\n`;
+        const blob = new Blob([fileContent], { type: 'text/javascript;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'projects.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+
+      copyBtn.addEventListener('click', () => {
+        const serialized = JSON.stringify(projects, null, 2);
+        navigator.clipboard.writeText(serialized).then(() => {
+          copyBtn.textContent = 'Copied to Clipboard! ✓';
+          setTimeout(() => { copyBtn.textContent = 'Copy JSON to Clipboard'; }, 2000);
+        });
+      });
+
+      populateSelector();
+    })();
+  </script>
+</body>
+</html>
